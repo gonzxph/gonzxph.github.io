@@ -5,25 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cryptography Ciphers</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-        textarea { width: 80%; height: 100px; margin: 10px 0; }
-        button { padding: 10px; margin: 10px; }
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #1e1e1e; color: white; }
+        .container { width: 50%; margin: auto; background: #2a2a2a; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px #000; }
+        textarea, input { width: 90%; padding: 10px; margin: 10px 0; background: #3a3a3a; color: white; border: none; border-radius: 5px; }
+        button { padding: 10px; margin: 10px; background: #ff9800; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #e68900; }
+        .tabs { display: flex; justify-content: space-around; background: #333; padding: 10px; border-radius: 10px; }
+        .tab { padding: 10px; cursor: pointer; color: white; }
+        .tab:hover { background: #555; border-radius: 5px; }
+        .tab-content { display: none; }
+        .active { display: block; }
     </style>
 </head>
 <body>
     <h2>Cryptography Ciphers</h2>
-    <textarea id="inputText" placeholder="Enter text..."></textarea><br>
-    <input type="number" id="shift" placeholder="Shift (Caesar Cipher)" /><br>
-    <button onclick="encryptCaesar()">Encrypt (Caesar)</button>
-    <button onclick="decryptCaesar()">Decrypt (Caesar)</button><br>
-    <button onclick="encryptMono()">Encrypt (Monoalphabetic)</button>
-    <button onclick="decryptMono()">Decrypt (Monoalphabetic)</button><br>
-    <button onclick="encryptPlayfair()">Encrypt (Playfair)</button>
-    <button onclick="decryptPlayfair()">Decrypt (Playfair)</button><br>
-    <h3>Output:</h3>
-    <textarea id="outputText" readonly></textarea>
+    <div class="container">
+        <div class="tabs">
+            <div class="tab" onclick="openTab('caesar')">Caesar Cipher</div>
+            <div class="tab" onclick="openTab('mono')">Monoalphabetic Cipher</div>
+            <div class="tab" onclick="openTab('playfair')">Playfair Cipher</div>
+        </div>
+        
+        <div id="caesar" class="tab-content active">
+            <textarea id="inputText" placeholder="Enter text..."></textarea><br>
+            <input type="number" id="shift" placeholder="Shift (Caesar Cipher)" /><br>
+            <button onclick="encryptCaesar()">Encrypt</button>
+            <button onclick="decryptCaesar()">Decrypt</button>
+            <h3>Output:</h3>
+            <textarea id="outputText" readonly></textarea>
+        </div>
+        
+        <div id="mono" class="tab-content">
+            <textarea id="monoInput" placeholder="Enter text..."></textarea><br>
+            <button onclick="encryptMono()">Encrypt</button>
+            <button onclick="decryptMono()">Decrypt</button>
+            <h3>Output:</h3>
+            <textarea id="monoOutput" readonly></textarea>
+        </div>
+        
+        <div id="playfair" class="tab-content">
+            <textarea id="playfairInput" placeholder="Enter text..."></textarea><br>
+            <button onclick="encryptPlayfair()">Encrypt</button>
+            <button onclick="decryptPlayfair()">Decrypt</button>
+            <h3>Output:</h3>
+            <textarea id="playfairOutput" readonly></textarea>
+        </div>
+    </div>
     
     <script>
+        function openTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+        }
+        
         function encryptCaesar() {
             let text = document.getElementById("inputText").value;
             let shift = parseInt(document.getElementById("shift").value) || 3;
@@ -47,76 +81,21 @@
         const monoDecryptionKey = Object.fromEntries(Object.entries(monoKey).map(([k, v]) => [v, k]));
 
         function encryptMono() {
-            let text = document.getElementById("inputText").value.toUpperCase();
-            document.getElementById("outputText").value = text.replace(/[A-Z]/g, char => monoKey[char] || char);
+            let text = document.getElementById("monoInput").value.toUpperCase();
+            document.getElementById("monoOutput").value = text.replace(/[A-Z]/g, char => monoKey[char] || char);
         }
         
         function decryptMono() {
-            let text = document.getElementById("inputText").value.toUpperCase();
-            document.getElementById("outputText").value = text.replace(/[A-Z]/g, char => monoDecryptionKey[char] || char);
+            let text = document.getElementById("monoInput").value.toUpperCase();
+            document.getElementById("monoOutput").value = text.replace(/[A-Z]/g, char => monoDecryptionKey[char] || char);
         }
 
-        function generatePlayfairMatrix(key) {
-            key = key.toUpperCase().replace(/J/g, "I").replace(/[^A-Z]/g, "");
-            let matrix = "";
-            let seen = new Set();
-            for (let char of key + "ABCDEFGHIKLMNOPQRSTUVWXYZ") {
-                if (!seen.has(char)) {
-                    matrix += char;
-                    seen.add(char);
-                }
-            }
-            return matrix.match(/.{1,5}/g);
-        }
-        
         function encryptPlayfair() {
-            let key = "KEYWORD";
-            let matrix = generatePlayfairMatrix(key);
-            document.getElementById("outputText").value = playfairCipher(document.getElementById("inputText").value, matrix, true);
+            alert("Playfair Cipher encryption is yet to be implemented.");
         }
 
         function decryptPlayfair() {
-            let key = "KEYWORD";
-            let matrix = generatePlayfairMatrix(key);
-            document.getElementById("outputText").value = playfairCipher(document.getElementById("inputText").value, matrix, false);
-        }
-
-        function playfairCipher(text, matrix, encrypt = true) {
-            text = text.toUpperCase().replace(/J/g, "I").replace(/[^A-Z]/g, "");
-            let digraphs = [];
-            for (let i = 0; i < text.length; i += 2) {
-                let a = text[i];
-                let b = text[i + 1] || "X";
-                if (a === b) b = "X";
-                digraphs.push(a + b);
-            }
-            
-            let output = "";
-            for (let pair of digraphs) {
-                let [a, b] = pair;
-                let [ax, ay] = findPosition(matrix, a);
-                let [bx, by] = findPosition(matrix, b);
-                
-                if (ax === bx) {
-                    ay = (ay + (encrypt ? 1 : 4)) % 5;
-                    by = (by + (encrypt ? 1 : 4)) % 5;
-                } else if (ay === by) {
-                    ax = (ax + (encrypt ? 1 : 4)) % 5;
-                    bx = (bx + (encrypt ? 1 : 4)) % 5;
-                } else {
-                    [ay, by] = [by, ay];
-                }
-                output += matrix[ax][ay] + matrix[bx][by];
-            }
-            return output;
-        }
-
-        function findPosition(matrix, letter) {
-            for (let x = 0; x < 5; x++) {
-                for (let y = 0; y < 5; y++) {
-                    if (matrix[x][y] === letter) return [x, y];
-                }
-            }
+            alert("Playfair Cipher decryption is yet to be implemented.");
         }
     </script>
 </body>
