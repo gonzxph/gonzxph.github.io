@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptography Ciphers</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        textarea { width: 80%; height: 100px; margin: 10px 0; }
+        button { padding: 10px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Cryptography Ciphers</h2>
+    <textarea id="inputText" placeholder="Enter text..."></textarea><br>
+    <input type="number" id="shift" placeholder="Shift (Caesar Cipher)" /><br>
+    <button onclick="encryptCaesar()">Encrypt (Caesar)</button>
+    <button onclick="decryptCaesar()">Decrypt (Caesar)</button><br>
+    <button onclick="encryptMono()">Encrypt (Monoalphabetic)</button>
+    <button onclick="decryptMono()">Decrypt (Monoalphabetic)</button><br>
+    <button onclick="encryptPlayfair()">Encrypt (Playfair)</button>
+    <button onclick="decryptPlayfair()">Decrypt (Playfair)</button><br>
+    <h3>Output:</h3>
+    <textarea id="outputText" readonly></textarea>
+    
+    <script>
+        function encryptCaesar() {
+            let text = document.getElementById("inputText").value;
+            let shift = parseInt(document.getElementById("shift").value) || 3;
+            document.getElementById("outputText").value = caesarCipher(text, shift);
+        }
+        
+        function decryptCaesar() {
+            let text = document.getElementById("inputText").value;
+            let shift = parseInt(document.getElementById("shift").value) || 3;
+            document.getElementById("outputText").value = caesarCipher(text, -shift);
+        }
+        
+        function caesarCipher(text, shift) {
+            return text.replace(/[a-zA-Z]/g, function(char) {
+                let base = char >= 'a' ? 97 : 65;
+                return String.fromCharCode(((char.charCodeAt(0) - base + shift) % 26 + 26) % 26 + base);
+            });
+        }
+
+        const monoKey = { A: "X", B: "Q", C: "W", D: "E", E: "R", F: "T", G: "Y", H: "U", I: "I", J: "O", K: "P", L: "A", M: "S", N: "D", O: "F", P: "G", Q: "H", R: "J", S: "K", T: "L", U: "Z", V: "X", W: "C", X: "V", Y: "B", Z: "N" };
+        const monoDecryptionKey = Object.fromEntries(Object.entries(monoKey).map(([k, v]) => [v, k]));
+
+        function encryptMono() {
+            let text = document.getElementById("inputText").value.toUpperCase();
+            document.getElementById("outputText").value = text.replace(/[A-Z]/g, char => monoKey[char] || char);
+        }
+        
+        function decryptMono() {
+            let text = document.getElementById("inputText").value.toUpperCase();
+            document.getElementById("outputText").value = text.replace(/[A-Z]/g, char => monoDecryptionKey[char] || char);
+        }
+
+        function generatePlayfairMatrix(key) {
+            key = key.toUpperCase().replace(/J/g, "I").replace(/[^A-Z]/g, "");
+            let matrix = "";
+            let seen = new Set();
+            for (let char of key + "ABCDEFGHIKLMNOPQRSTUVWXYZ") {
+                if (!seen.has(char)) {
+                    matrix += char;
+                    seen.add(char);
+                }
+            }
+            return matrix.match(/.{1,5}/g);
+        }
+        
+        function encryptPlayfair() {
+            let key = "KEYWORD";
+            let matrix = generatePlayfairMatrix(key);
+            document.getElementById("outputText").value = playfairCipher(document.getElementById("inputText").value, matrix, true);
+        }
+
+        function decryptPlayfair() {
+            let key = "KEYWORD";
+            let matrix = generatePlayfairMatrix(key);
+            document.getElementById("outputText").value = playfairCipher(document.getElementById("inputText").value, matrix, false);
+        }
+
+        function playfairCipher(text, matrix, encrypt = true) {
+            text = text.toUpperCase().replace(/J/g, "I").replace(/[^A-Z]/g, "");
+            let digraphs = [];
+            for (let i = 0; i < text.length; i += 2) {
+                let a = text[i];
+                let b = text[i + 1] || "X";
+                if (a === b) b = "X";
+                digraphs.push(a + b);
+            }
+            
+            let output = "";
+            for (let pair of digraphs) {
+                let [a, b] = pair;
+                let [ax, ay] = findPosition(matrix, a);
+                let [bx, by] = findPosition(matrix, b);
+                
+                if (ax === bx) {
+                    ay = (ay + (encrypt ? 1 : 4)) % 5;
+                    by = (by + (encrypt ? 1 : 4)) % 5;
+                } else if (ay === by) {
+                    ax = (ax + (encrypt ? 1 : 4)) % 5;
+                    bx = (bx + (encrypt ? 1 : 4)) % 5;
+                } else {
+                    [ay, by] = [by, ay];
+                }
+                output += matrix[ax][ay] + matrix[bx][by];
+            }
+            return output;
+        }
+
+        function findPosition(matrix, letter) {
+            for (let x = 0; x < 5; x++) {
+                for (let y = 0; y < 5; y++) {
+                    if (matrix[x][y] === letter) return [x, y];
+                }
+            }
+        }
+    </script>
+</body>
+</html>
