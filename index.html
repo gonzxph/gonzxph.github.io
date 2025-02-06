@@ -12,7 +12,7 @@
         button:hover { background: #e68900; }
         .tabs { display: flex; justify-content: space-around; background: #333; padding: 10px; border-radius: 10px; }
         .tab { padding: 10px; cursor: pointer; color: white; }
-        .tab:hover { background: #555; border-radius: 5px; }
+        .tab:hover, .tab.active-tab { background: #555; border-radius: 5px; }
         .tab-content { display: none; }
         .active { display: block; }
     </style>
@@ -21,9 +21,9 @@
     <h2>Cryptography Ciphers</h2>
     <div class="container">
         <div class="tabs">
-            <div class="tab" onclick="openTab('caesar')">Caesar Cipher</div>
-            <div class="tab" onclick="openTab('mono')">Monoalphabetic Cipher</div>
-            <div class="tab" onclick="openTab('playfair')">Playfair Cipher</div>
+            <div class="tab active-tab" onclick="openTab('caesar', this)">Caesar Cipher</div>
+            <div class="tab" onclick="openTab('mono', this)">Monoalphabetic Cipher</div>
+            <div class="tab" onclick="openTab('playfair', this)">Playfair Cipher</div>
         </div>
         
         <div id="caesar" class="tab-content active">
@@ -53,9 +53,12 @@
     </div>
     
     <script>
-        function openTab(tabName) {
+        function openTab(tabName, element) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.getElementById(tabName).classList.add('active');
+            
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active-tab'));
+            element.classList.add('active-tab');
         }
         
         function encryptCaesar() {
