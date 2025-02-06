@@ -94,11 +94,13 @@
         }
 
         function encryptPlayfair() {
-            alert("Playfair Cipher encryption is yet to be implemented.");
+            let text = document.getElementById("playfairInput").value.toUpperCase().replace(/J/g, "I").replace(/[^A-Z]/g, "");
+            document.getElementById("playfairOutput").value = text; // Placeholder for encryption logic
         }
 
         function decryptPlayfair() {
-            alert("Playfair Cipher decryption is yet to be implemented.");
+            let text = document.getElementById("playfairInput").value.toUpperCase().replace(/J/g, "I").replace(/[^A-Z]/g, "");
+            document.getElementById("playfairOutput").value = text; // Placeholder for decryption logic
         }
     </script>
 </body>
