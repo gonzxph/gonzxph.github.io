@@ -5,102 +5,303 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cryptography Ciphers</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #1e1e1e; color: white; }
-        .container { width: 50%; margin: auto; background: #2a2a2a; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px #000; }
-        textarea, input { width: 90%; padding: 10px; margin: 10px 0; background: #3a3a3a; color: white; border: none; border-radius: 5px; }
-        button { padding: 10px; margin: 10px; background: #ff9800; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background: #e68900; }
-        .tabs { display: flex; justify-content: space-around; background: #333; padding: 10px; border-radius: 10px; }
-        .tab { padding: 10px; cursor: pointer; color: white; }
-        .tab:hover, .tab.active-tab { background: #555; border-radius: 5px; }
-        .tab-content { display: none; }
-        .active { display: block; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            margin: 0;
+            padding: 20px;
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #2a2a2a;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .cipher-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .cipher-tab {
+            padding: 10px 20px;
+            background-color: #444;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+
+        .cipher-tab.active {
+            background-color: #666;
+        }
+
+        .input-area {
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            background-color: #333;
+            border: 1px solid #444;
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            background-color: #333;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #ff9800;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #f57c00;
+        }
+
+        .output-area {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 6px;
+            min-height: 100px;
+        }
+
+        h2 {
+            color: white;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
-    <h2>Cryptography Ciphers</h2>
     <div class="container">
-        <div class="tabs">
-            <div class="tab active-tab" onclick="openTab('caesar', this)">Caesar Cipher</div>
-            <div class="tab" onclick="openTab('mono', this)">Monoalphabetic Cipher</div>
-            <div class="tab" onclick="openTab('playfair', this)">Playfair Cipher</div>
-        </div>
+        <h1>Cryptography Ciphers</h1>
         
-        <div id="caesar" class="tab-content active">
-            <textarea id="inputText" placeholder="Enter text..."></textarea><br>
-            <input type="number" id="shift" placeholder="Shift (Caesar Cipher)" /><br>
-            <button onclick="encryptCaesar()">Encrypt</button>
-            <button onclick="decryptCaesar()">Decrypt</button>
-            <h3>Output:</h3>
-            <textarea id="outputText" readonly></textarea>
+        <div class="cipher-tabs">
+            <button class="cipher-tab active" onclick="switchTab('caesar')">Caesar Cipher</button>
+            <button class="cipher-tab" onclick="switchTab('mono')">Monoalphabetic Cipher</button>
+            <button class="cipher-tab" onclick="switchTab('playfair')">Playfair Cipher</button>
         </div>
-        
-        <div id="mono" class="tab-content">
-            <textarea id="monoInput" placeholder="Enter text..."></textarea><br>
-            <button onclick="encryptMono()">Encrypt</button>
-            <button onclick="decryptMono()">Decrypt</button>
-            <h3>Output:</h3>
-            <textarea id="monoOutput" readonly></textarea>
+
+        <div class="input-area">
+            <textarea id="inputText" placeholder="Enter text..."></textarea>
+            <div id="caesarInput">
+                <input type="number" id="shift" placeholder="Shift (default: 3)" value="3">
+            </div>
+            <div id="monoInput" style="display: none;">
+                <input type="text" id="monoKey" placeholder="Key (default: QWERTYUIOPASDFGHJKLZXCVBNM)" value="QWERTYUIOPASDFGHJKLZXCVBNM">
+            </div>
+            <div id="playfairInput" style="display: none;">
+                <input type="text" id="playfairKey" placeholder="Keyword" value="KEYWORD">
+            </div>
         </div>
-        
-        <div id="playfair" class="tab-content">
-            <textarea id="playfairInput" placeholder="Enter text..."></textarea><br>
-            <button onclick="encryptPlayfair()">Encrypt</button>
-            <button onclick="decryptPlayfair()">Decrypt</button>
-            <h3>Output:</h3>
-            <textarea id="playfairOutput" readonly></textarea>
+
+        <div class="button-group">
+            <button onclick="encrypt()">Encrypt</button>
+            <button onclick="decrypt()">Decrypt</button>
+        </div>
+
+        <h2>Output:</h2>
+        <div class="output-area">
+            <p id="output"></p>
         </div>
     </div>
-    
+
     <script>
-        function openTab(tabName, element) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
+        let currentCipher = 'caesar';
+
+        function switchTab(cipher) {
+            document.querySelectorAll('.cipher-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
             
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active-tab'));
-            element.classList.add('active-tab');
+            document.getElementById('caesarInput').style.display = 'none';
+            document.getElementById('monoInput').style.display = 'none';
+            document.getElementById('playfairInput').style.display = 'none';
+            
+            document.getElementById(`${cipher}Input`).style.display = 'block';
+            currentCipher = cipher;
         }
-        
-        function encryptCaesar() {
-            let text = document.getElementById("inputText").value;
-            let shift = parseInt(document.getElementById("shift").value) || 3;
-            document.getElementById("outputText").value = caesarCipher(text, shift);
-        }
-        
-        function decryptCaesar() {
-            let text = document.getElementById("inputText").value;
-            let shift = parseInt(document.getElementById("shift").value) || 3;
-            document.getElementById("outputText").value = caesarCipher(text, -shift);
-        }
-        
-        function caesarCipher(text, shift) {
-            return text.replace(/[a-zA-Z]/g, function(char) {
-                let base = char >= 'a' ? 97 : 65;
-                return String.fromCharCode(((char.charCodeAt(0) - base + shift) % 26 + 26) % 26 + base);
+
+        // Caesar Cipher Implementation
+        function caesarCipher(text, shift, decrypt = false) {
+            if (decrypt) shift = (26 - shift) % 26;
+            return text.replace(/[a-zA-Z]/g, char => {
+                const code = char.charCodeAt(0);
+                const base = code >= 97 ? 97 : 65;
+                return String.fromCharCode((code - base + shift) % 26 + base);
             });
         }
 
-        const monoKey = { A: "X", B: "Q", C: "W", D: "E", E: "R", F: "T", G: "Y", H: "U", I: "I", J: "O", K: "P", L: "A", M: "S", N: "D", O: "F", P: "G", Q: "H", R: "J", S: "K", T: "L", U: "Z", V: "X", W: "C", X: "V", Y: "B", Z: "N" };
-        const monoDecryptionKey = Object.fromEntries(Object.entries(monoKey).map(([k, v]) => [v, k]));
+        // Monoalphabetic Cipher Implementation
+        function monoalphabeticCipher(text, key, decrypt = false) {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const mapping = {};
+            
+            if (decrypt) {
+                for (let i = 0; i < 26; i++) {
+                    mapping[key[i]] = alphabet[i];
+                }
+            } else {
+                for (let i = 0; i < 26; i++) {
+                    mapping[alphabet[i]] = key[i];
+                }
+            }
 
-        function encryptMono() {
-            let text = document.getElementById("monoInput").value.toUpperCase();
-            document.getElementById("monoOutput").value = text.replace(/[A-Z]/g, char => monoKey[char] || char);
-        }
-        
-        function decryptMono() {
-            let text = document.getElementById("monoInput").value.toUpperCase();
-            document.getElementById("monoOutput").value = text.replace(/[A-Z]/g, char => monoDecryptionKey[char] || char);
+            return text.toUpperCase().split('').map(char => {
+                return mapping[char] || char;
+            }).join('');
         }
 
-        function encryptPlayfair() {
-            let text = document.getElementById("playfairInput").value.toUpperCase().replace(/J/g, "I").replace(/[^A-Z]/g, "");
-            document.getElementById("playfairOutput").value = text; // Placeholder for encryption logic
+        // Playfair Cipher Implementation
+        function createPlayfairMatrix(key) {
+            key = key.toUpperCase().replace(/J/g, 'I');
+            const alphabet = 'ABCDEFGHIKLMNOPQRSTUVWXYZ';
+            const matrix = [];
+            const used = new Set();
+
+            // Add key characters
+            for (let char of key) {
+                if (!used.has(char) && char >= 'A' && char <= 'Z') {
+                    matrix.push(char);
+                    used.add(char);
+                }
+            }
+
+            // Add remaining alphabet
+            for (let char of alphabet) {
+                if (!used.has(char)) {
+                    matrix.push(char);
+                    used.add(char);
+                }
+            }
+
+            return matrix;
         }
 
-        function decryptPlayfair() {
-            let text = document.getElementById("playfairInput").value.toUpperCase().replace(/J/g, "I").replace(/[^A-Z]/g, "");
-            document.getElementById("playfairOutput").value = text; // Placeholder for decryption logic
+        function findPosition(matrix, char) {
+            const index = matrix.indexOf(char);
+            return [Math.floor(index / 5), index % 5];
+        }
+
+        function playfairCipher(text, key, decrypt = false) {
+            const matrix = createPlayfairMatrix(key);
+            text = text.toUpperCase().replace(/J/g, 'I').replace(/[^A-Z]/g, '');
+            
+            // Prepare digraphs
+            let digraphs = [];
+            for (let i = 0; i < text.length; i += 2) {
+                let pair = text[i];
+                if (i + 1 < text.length) {
+                    if (text[i] === text[i + 1]) {
+                        pair += 'X';
+                        i--;
+                    } else {
+                        pair += text[i + 1];
+                    }
+                } else {
+                    pair += 'X';
+                }
+                digraphs.push(pair);
+            }
+
+            return digraphs.map(digraph => {
+                let [row1, col1] = findPosition(matrix, digraph[0]);
+                let [row2, col2] = findPosition(matrix, digraph[1]);
+
+                if (row1 === row2) {
+                    col1 = (col1 + (decrypt ? -1 : 1) + 5) % 5;
+                    col2 = (col2 + (decrypt ? -1 : 1) + 5) % 5;
+                } else if (col1 === col2) {
+                    row1 = (row1 + (decrypt ? -1 : 1) + 5) % 5;
+                    row2 = (row2 + (decrypt ? -1 : 1) + 5) % 5;
+                } else {
+                    [col1, col2] = [col2, col1];
+                }
+
+                return matrix[row1 * 5 + col1] + matrix[row2 * 5 + col2];
+            }).join('');
+        }
+
+        function encrypt() {
+            const text = document.getElementById('inputText').value;
+            let result = '';
+
+            switch (currentCipher) {
+                case 'caesar':
+                    const shift = parseInt(document.getElementById('shift').value) || 3;
+                    result = caesarCipher(text, shift);
+                    break;
+                case 'mono':
+                    const monoKey = document.getElementById('monoKey').value || 'QWERTYUIOPASDFGHJKLZXCVBNM';
+                    result = monoalphabeticCipher(text, monoKey);
+                    break;
+                case 'playfair':
+                    const playfairKey = document.getElementById('playfairKey').value || 'KEYWORD';
+                    result = playfairCipher(text, playfairKey);
+                    break;
+            }
+
+            document.getElementById('output').textContent = result;
+        }
+
+        function decrypt() {
+            const text = document.getElementById('inputText').value;
+            let result = '';
+
+            switch (currentCipher) {
+                case 'caesar':
+                    const shift = parseInt(document.getElementById('shift').value) || 3;
+                    result = caesarCipher(text, shift, true);
+                    break;
+                case 'mono':
+                    const monoKey = document.getElementById('monoKey').value || 'QWERTYUIOPASDFGHJKLZXCVBNM';
+                    result = monoalphabeticCipher(text, monoKey, true);
+                    break;
+                case 'playfair':
+                    const playfairKey = document.getElementById('playfairKey').value || 'KEYWORD';
+                    result = playfairCipher(text, playfairKey, true);
+                    break;
+            }
+
+            document.getElementById('output').textContent = result;
         }
     </script>
 </body>
