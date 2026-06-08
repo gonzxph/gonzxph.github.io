@@ -2,35 +2,28 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Deep Link PoC</title>
+  <title>Deep Link PoC (intent://)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
 <body>
-  <h3>Deep Link PoC</h3>
-  <p>If the app is installed, the link below should open it. If not, you'll stay here.</p>
-  <a id="manual" href="sa187d8f14://7000?url=https://gonzxph.github.io/deeplink.html">Open app (click if auto-open fails)</a>
+  <h3>Deep Link PoC (intent://)</h3>
+  <p>Tap the Intent link below. If the app is installed it should open with the same data as the ADB intent.</p>
+
+  <!-- Intent URI replicates: am start -a android.intent.action.VIEW -d "sa187d8f14://7000?url=... " -->
+  <a id="intentLink"
+     href="intent://7000?url=https%3A%2F%2Fgonzxph.github.io%2Fdeeplink.html#Intent;scheme=sa187d8f14;end">
+    Open app via intent://
+  </a>
+  <p>If the above doesn't work, tap the plain scheme link below (may be blocked by some browsers):</p>
+  <a id="schemeLink" href="sa187d8f14://7000?url=https://gonzxph.github.io/deeplink.html">Open app via sa187d8f14://</a>
 
   <script>
-    (function(){
-      var target = 'sa187d8f14://7000?url=' + encodeURIComponent('https://gonzxph.github.io/deeplink.html');
-
-      function tryOpen() {
-        // Primary: navigate (may require user gesture in some browsers)
-        window.location = target;
-
-        // Fallback: hidden iframe (older Android webviews/browsers)
-        var ifr = document.createElement('iframe');
-        ifr.style.display = 'none';
-        ifr.src = target;
-        document.body.appendChild(ifr);
-        setTimeout(function(){ try { document.body.removeChild(ifr); } catch(e){} }, 1200);
-      }
-
-      // Auto-trigger after a short delay; user can also click the link.
-      window.addEventListener('load', function(){
-        setTimeout(tryOpen, 300);
-      }, false);
-    })();
+    // try to trigger on user gesture too (many browsers block automatic redirects)
+    document.getElementById('intentLink').addEventListener('click', function(e){
+      // allow default navigation but also attempt assign for older webviews
+      var intent = this.href;
+      setTimeout(function(){ window.location = intent; }, 50);
+    }, false);
   </script>
 </body>
 </html>
