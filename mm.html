@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<body>
+<script>
+const OAST = "https://kyfcridixbvmtsbeaesvfl6m2tbevou5m.oast.fun/ping";
+
+fetch(OAST, {
+    method: "GET",
+    mode: "no-cors"
+})
+.then(() => console.log("Fetch attempted"))
+.catch(err => console.error(err));
+</script>
+</body>
+</html>
